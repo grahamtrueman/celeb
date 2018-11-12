@@ -1,0 +1,3 @@
+<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+User-agent: *
+Disallow: /

@@ -1,0 +1,624 @@
+<!--TEMPLATE-->
+<html lang="en">
+<link rel="stylesheet" type="text/css" href="http://intranet.micketts.co.uk/style/celeb.css">
+[[SETENV]]
+
+[[IF ($Xaction eq 'table')]]        [[LEAGUETABLE]]			[[/IF]]
+[[IF ($Xaction eq 'edit')]]			[[EDITOR]]				[[/IF]]
+[[IF ($Xaction eq 'addceleb')]]		[[ADDDATA]]				[[/IF]]
+[[IF ($Xaction eq 'dataedit')]]		[[DATAEDIT]]			[[/IF]]
+[[IF ($Xaction eq 'delete')]]		[[DELETE]]				[[/IF]]
+[[IF ($Xaction eq 'deleteperm')]]	[[DELETEPERM]]			[[/IF]]
+[[IF ($Xaction eq 'list')]]			[[RETURNLISTSELECTOR]]	[[/IF]]
+[[IF ($Xaction eq 'update')]]		[[UPDATE]]				[[/IF]]
+[[IF ($Xaction eq 'repost')]]		[[REPOST]]				[[/IF]]
+[[IF ($Xaction eq '')]]         	[[SETMAINTABLE]]		[[/IF]]
+
+
+
+</html>
+<!--/TEMPLATE-->
+
+<!--SETMAINTABLE-->
+
+        <table cellspacing="0" cellpadding="0" border="0" width="100%">
+                <tr>
+                        <td class="backpanel" colspan="7">&nbsp;</td>
+                </tr>
+                <tr>
+                        <td class="tophead" width=20>&nbsp;</td>
+                        <td class="tophead" width=240></td>
+                        <td width=20 class="title">&nbsp;</td>
+                        <td width=240 class="title">CELEB LIST 2018</td>
+                        <td width=20 class="title">&nbsp;</td>
+                        <td width=240 class="tophead" valign="bottom" align="right"><span class="listitem"><strong>[[TIMESTAMP]]</strong></span></td>
+                        <td class="tophead" width=20>&nbsp;</td>
+                </tr>
+                <tr>
+                        <td class="backpanel" colspan="7">&nbsp;</td>
+                </tr>
+                <tr>
+                        <td width=20 class="backpanel" rowspan="3">&nbsp;</td>
+                        <td class="innertable" width=240 valign="top" rowspan="3">[[LASTUPDATE]]</td>
+                        <td width=20 class="backpanel" rowspan="3">&nbsp;</td>
+                        <td class="innertable" width=240 valign="top">[[CATEGORIES]]</td>
+                        <td width=20 class="backpanel" rowspan="3">&nbsp;</td>
+                        <td class="innertable" width=240 valign="top" rowspan="3">[[LEADERBOARD]]</td>
+                        <td width=20 class="backpanel" rowspan="3">&nbsp;</td>
+                </tr>
+                <tr>
+                        <td class="backpanel">&nbsp;</td>
+                </tr>
+                <tr>
+                        <td class="backpanel" colspan="7">&nbsp;</td>
+                </tr>
+				<tr>
+                        <td class="backpanel" colspan="7">&nbsp;</td>
+                </tr>
+        </table>
+		
+		
+
+<!--/SETMAINTABLE-->
+
+<!--TIMESTAMP-->
+        [[EVAL ( &displayDate(time) )]] [[EVAL ( &displayTime(time,"h:m:s") )]]
+<!--/TIMESTAMP-->
+
+
+<!--LEADERBOARD-->
+	<h2>Leaderboard</h2>
+		<table align="center">
+			<tr>
+			</tr>
+                [[SQL ~
+					SELECT C.id,SUM(C.points) AS score,U.`short`
+					FROM celebs AS C
+					LEFT JOIN users AS U
+					ON C.owner=U.id
+					GROUP BY U.short
+					ORDER BY score DESC
+					~uid,pts,uname~]]
+					<tr>
+						<td>[[uname]]</td>
+						<td>[[IF ($pts >0)]]<font color="red">[[/IF]][[pts]]</font></td>
+					</tr>
+                [[/SQL]]
+		</table>
+<!--/LEADERBOARD-->
+
+<!--CATEGORIES-->
+	<h2>Management</h2>
+		<ul>
+			<li>Edit your list</li>
+			[[USERSELECT]]
+			<li>View all lists</li>
+			[[VIEWALLLISTS]]
+			<li>Read Wikipedia article</li>
+		    [[WIKISEARCH]]
+		</ul>
+
+<!--/CATEGORIES-->
+
+<!--USERSELECT-->
+		<form name="switcher" action="http://celeb.micketts.co.uk/cgi-bin/main.cgi" method="post">
+			<select name="id" onchange="submit()">
+                <option value="">This is a list of all users</option>
+                <option value="">--------SELECT-------------</option>
+                        [[SQL ~
+                                SELECT id,`short`,`Full`
+                                FROM users
+                                ORDER BY `id`
+                                ~uid,uname,utitle~]]
+                <option [[IF ($Xname eq '[[uname]]')]]selected [[/IF]]value="[[uid]]">[[utitle]]</option>
+                        [[/SQL]]
+				</select>
+				<input type="hidden" name="action" value="edit">
+        </form>
+<!--/USERSELECT-->
+	
+<!--CHANGER-->
+
+	[[SQL ~
+		UPDATE categories
+		SET active=0
+		WHERE active > 0
+		~~]]
+	[[/SQL]]
+	[[SQL ~
+		UPDATE categories
+		SET active=1
+		WHERE id=[[VERYHARD Xid]]
+		~~]]
+	[[/SQL]]
+	[[SQL ~
+		SELECT category
+		FROM categories
+		WHERE id=[[VERYHARD Xid]]
+		~cCat~]]
+	[[/SQL]]
+	Category changed to [[cCat]]
+	<META HTTP-EQUIV="refresh" CONTENT="2; URL=http://celeb.micketts.co.uk/main">
+<!--/CHANGER-->
+
+<!--LASTUPDATE-->
+	<h2>Last added</h2>
+		[[SQL ~
+			SELECT name,wikipedia,owner,DATE_FORMAT(entryDate, '%D %M %Y'),`short`
+			FROM celebs AS C
+			LEFT JOIN users AS U
+			ON C.owner=U.id
+			WHERE C.entryDate=(SELECT MAX(entryDate) FROM celebs)
+			~fn,wp,own,dte,sn~]]
+			
+		[[/SQL]]	
+		<p>
+			
+			<strong><a href="https://en.wikipedia.org/wiki/[[wp]]" target="_blank">[[fn]]</a></strong><br />
+			<i>Added by [[sn]] <br />&nbsp;&nbsp;&nbsp;on: [[dte]]</i>
+		</p>
+<!--/LASTUPDATE-->
+
+<!--EDITOR-->
+
+[[RETURNTOMENU]]
+
+	[[SQL ~
+		SELECT short 
+		FROM users
+		WHERE id=[[VERYHARD Xid]]
+		~uname~]]
+	<h2>This is the editor section for [[uname]]</h2>
+	[[/SQL]]
+	
+	<table align="centre">
+		<tr>
+			<td class="listheading">Name</td>
+			<td class="listheading">Date of birth</td>
+			<td class="listheading">Date Entered</td>
+			<td class="listheading">Status</td>
+			<td class="listheading">Points</td>
+			<td class="listheading">Actions</td>
+		</tr>
+		[[SQL ~
+			SELECT C.id,C.name,C.wikipedia,DATE_FORMAT(C.dob, '%e %b %Y'),DATE_FORMAT(C.entryDate, '%e %b %Y'),S.category,S.hex,C.points
+			FROM celebs AS C
+			LEFT JOIN noteType AS S
+			ON C.`status`=S.id
+			LEFT JOIN users AS U
+			ON U.id=C.owner
+			WHERE U.id='[[VERYHARD Xid]]';
+			~cid,cname,clink,cdob,centry,cCat,shex,pts~]]
+			<tr>
+				<td class="listitem">[[IF ($cCat eq 'DECEASED')]]<del>[[cname]]</del>[[/IF]][[IF ($cCat ne 'DECEASED')]][[cname]][[/IF]]</td>
+				<td class="listitem">[[cdob]]</td>
+				<td class="listitem">[[centry]]</td>
+				<td class="listitem"><font color="[[shex]]">[[cCat]]</font></td>
+				<td class="listitem">[[IF ($cCat eq 'DECEASED')]]&nbsp;<font color="#a72020">[[pts]]</font>[[/IF]][[IF ($cCat ne 'DECEASED')]]&nbsp;N/A[[/IF]]</td>
+				[[IF ($cCat ne 'DECEASED')]]<td class="listitem">[<a href="/main?action=delete~user=[[VERYHARD Xid]]~cid=[[cid]]">DELETE</a>][<a href="/main?action=update~user=[[VERYHARD Xid]]~cid=[[cid]]">UPDATE</a>]</td>[[/IF]]
+				[[IF ($cCat eq 'DECEASED')]]<td class="listitem">[<font color="#998c89">DELETE</font>][<a href="/main?action=update~user=[[VERYHARD Xid]]~cid=[[cid]]">UPDATE</a>]</td>[[/IF]]
+			</tr>
+		[[/SQL]]
+	</table>
+	<p>
+		[[SQL ~
+			SELECT COUNT(*), 10-COUNT(*)
+			FROM celebs AS C
+			LEFT JOIN `users` AS U
+			ON C.owner=U.id
+			WHERE U.id='[[VERYHARD Xid]]';
+			~tot,rem~]]
+			
+			[[IF ($tot eq 10)]]<font color="#000c51">You have used all 10 of your available selections</font>[[/IF]]
+			[[IF ($tot < 10)]]<font color="#000c51">You used [[tot]] of your available selections, and have <font color="#a72020">[[rem]]</font> remaining</font><br />[[ADDENTRY]][[/IF]]
+		[[/SQL]]	
+
+		
+<!--/EDITOR-->
+
+<!--ADDENTRY-->
+
+	<table>
+		<tr>
+		</tr>
+		<tr>
+			<td class="displaybox" colspan=5>Add a new celebrity to your list</td>
+		</tr>	
+		<tr>
+			<td colspan="5"></td>
+		</tr>
+			
+			<form name="addceleb" action="/main" method="post">
+			<input type="hidden" name="action" value="addceleb">
+			<input type="hidden" name="id" value="[[VERYHARD Xid]]">
+		<tr>
+			<td></td>
+			<td class="standardtext">Name: </td>
+			<td class="standardtext"><input type="text" name=cname size="32">
+		</tr>
+		<tr>
+			<td></td>
+			<td class="standardtext" align="right">http://en.wikipedia.org/wiki/</td>
+			<td align="left"><input type="text" name=wname size="32"></td>
+			<td class="standardtext"><i>Add Wikipedia URL</i></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td class="standardtext">Date of Birth: </td>
+			<td class="standardtext"><input type="text" name=dob size="10">
+			<td class="standardtext"><i>format: YYYY-MM-dd</i></td>
+		</tr>
+		</tr>
+			<td></td>
+			<td class="standardtext">Status:</td>
+            <td class="standardtext">
+                <select name="health">
+                    [[SQL ~
+                        SELECT id,category
+                        FROM noteType
+                        ORDER BY id ASC
+						~cId,cCat~]]
+                        <option [[IF ($cCat eq 'ALIVE AND WELL')]]selected [[/IF]]value=[[cId]]>[[cCat]]</option>
+					[[/SQL]]
+				</select>
+			</td>
+		<tr>	
+			<td colspan="2"></td>
+			<td class="standardtext"><input type="submit" value="add"><input type="reset" value="reset"></td>
+			<td></td>
+			</form>
+			<td></td>
+		</tr>
+	</table>
+<!--/ADDENTRY-->
+	
+<!--ADDDATA-->
+	
+	[[SQL ~
+		INSERT INTO celebs (name, wikipedia, dob, `status`, entryDate, owner)
+		value ('[[VERYHARD Xcname]]','[[VERYHARD Xwname]]','[[VERYHARD Xdob]]','[[VERYHARD Xhealth]]',CURDATE(),[[VERYHARD Xid]]);
+		~~]]
+	[[/SQL]]
+	
+	
+	<META HTTP-EQUIV="refresh" CONTENT="1; URL=http://celeb.micketts.co.uk/main">
+<!--/ADDDATA-->
+
+<!--DELETE-->
+	[[SQL ~
+		SELECT C.name,N.category
+		FROM celebs AS C
+		LEFT JOIN noteType AS N
+		ON C.status=N.id
+		WHERE C.id=[[VERYHARD Xcid]]
+		~cName,cCat~]]
+	[[/SQL]]	
+	Celeb: [[cName]]
+	Status: [[cCat]]
+	[[IF ($cCat eq 'DECEASED')]] Your celeb is dead, you cannot delete[[/IF]]
+	[[IF ($cCat ne 'DECEASED')]][[DELETEPERM]][[/IF]]
+	
+<!--/DELETE-->
+
+<!--DELETEPERM-->
+	    [[SQLMOD ~
+			DELETE from celebs	
+            WHERE id=[[VERYHARD Xcid]]
+            ~~]]
+            <font color="Green">Record deleted</font>
+        [[/SQLMOD/]]
+            <font color="Red">failed to remove record</font>
+        [[/SQLMOD]]
+	[[RETURNTOMENU]]
+<!--/DELETEPERM-->
+
+<!--UPDATE-->
+
+	<table border="0">
+		<tr>
+			<td colspan="2" class="displaybox">Data editor</td>
+		</tr>
+		<form name="dataedit" action="/main" method="post">
+		<input type="hidden" name="action" value="dataedit">
+		<input type="hidden" name="cid" value="[[VERYHARD Xcid]]">
+		<input type="hidden" name="user" value="[[VERYHARD Xuser]]">
+		[[SQL ~
+			SELECT C.name,C.wikipedia,C.dob,C.status,S.category,S.hex,C.owner,U.`short`,
+				DATE_FORMAT(NOW(), '%Y') - DATE_FORMAT(C.dob, '%Y') - (DATE_FORMAT(NOW(), '00-%m-%d') < DATE_FORMAT(C.dob, '00-%m-%d')), 
+				C.entryDate,
+				FORMAT((DATEDIFF("2018-12-31", C.entryDate)/3),0),
+				IF((FORMAT((DATEDIFF("2018-12-31", C.entryDate)/3),0)>116),100,(FORMAT((DATEDIFF("2018-12-31", C.entryDate)/3),0))),
+				DATE_FORMAT("[[VERYHARD Xdod]]", '%Y') - DATE_FORMAT(C.dob, '%Y') - (DATE_FORMAT("[[VERYHARD Xdod]]", '00-%m-%d') < DATE_FORMAT(C.dob, '00-%m-%d')),
+				(LEAST(100,FORMAT((DATEDIFF("2018-12-31", "2018-09-17")/3),0))*0.01)*(100 -(DATE_FORMAT(NOW(), '%Y') - DATE_FORMAT(C.dob, '%Y') - (DATE_FORMAT(NOW(), '00-%m-%d') < DATE_FORMAT(C.dob, '00-%m-%d'))))
+			FROM celebs AS C
+			LEFT JOIN noteType AS S
+			ON C.status=S.id
+			LEFT JOIN users AS U
+			ON C.owner=U.id
+			WHERE C.id=[[VERYHARD Xcid]];
+			~cname,www,cDoB,cStat,cCat,cHex,cOwn,sn,cAge,cEdate,cReal,cCalc,pPts~]]
+		<tr>
+			<td class="standardtext">Name: </td>
+			<td class="standardtext"><a href="http://en.wikipedia.org/wiki/[[www]]" target="_blank">[[cname]]</a></td>
+		</tr>
+		<tr>	
+			<td class="standardtext">Wikipedia URL:</td>
+			<td class="standardtext"><input name=www type="text" value='[[www]]'></td>
+		</tr>
+		<tr>	
+			<td class="standardtext">Date of Birth:</td>
+			<td class="standardtext"><input name=dob type="text" value='[[cDoB]]'></td>
+		</tr>
+		<tr>	
+			<td class="standardtext">Date of Death:</td>
+			<td class="standardtext"><input name=dod type="text" value=''></td>
+		</tr>
+		<tr>
+			<td>Status: </td>
+			<td class="standardtext"><select name="status">[[STATUSSELECT]]</select></td>
+		</tr>
+		<tr>
+			<td class="standardtext">Owner: </td>
+			<td class="standardtext">[[sn]]</td>
+		</tr>
+
+		[[/SQL]]
+		<tr>
+			<td></td>
+			<td class="standardtext"><input type="submit" value="update"><input type="reset" value="reset"></td>
+		</tr>
+		<tr>
+		</form>
+		<form name="delete" action="/main" method="post">
+			<input type="hidden" name="action" value="delete">
+			<input type="hidden" name="cid" value="[[VERYHARD Xcid]]">
+			<input type="hidden" name="user" value="[[VERYHARD Xuser]]">
+			<td></td>
+			<td class="standardtext"><input type="submit" value="delete"></td>
+		</form>	
+		</tr>
+	</table>
+	<p>If adding a Date of Death you must set the status of your celebrity to <font color="#a72020">DECEASED</font></p>
+	[[RETURNTOMENU]]
+<!--/UPDATE-->
+<!--STATUSSELECT-->
+				[[SQL ~	
+					SELECT id,category
+					FROM noteType
+					~nid,ncat~]]
+				 <option [[IF ($cCat eq $ncat)]]selected [[/IF]]value=[[nid]]>[[ncat]]</option>
+				 [[/SQL]]
+<!--/STATUSSELECT-->
+
+<!--DATAEDIT-->
+	Determine whether celebrity is dead, or not dead....<br />
+	[[SQL ~
+		SELECT category
+		FROM noteType
+		WHERE id=[[VERYHARD Xstatus]]
+		~Cat~]]
+	[[/SQL]]
+	
+	Category value: [[Cat]]
+	[[IF ($Cat eq 'DECEASED')]]	[[DEAD]]	[[/IF]]
+	[[IF ($Cat ne 'DECEASED')]]	[[NOTDEAD]]	[[/IF]]	
+	Record set updated
+	[[RETURNTOMENU]]
+	<META HTTP-EQUIV="refresh" CONTENT="2; URL=http://celeb.micketts.co.uk/main">
+		
+<!--/DATAEDIT-->
+
+<!--DEAD-->
+	Your celeb is dead ... calculating points .... <br />
+	[[SQL ~
+		SELECT 
+			`name`,
+			DATE_FORMAT(NOW(), '%Y') - DATE_FORMAT(C.dob, '%Y') - (DATE_FORMAT(NOW(), '00-%m-%d') < DATE_FORMAT(C.dob, '00-%m-%d')),
+			C.entryDate,
+			FORMAT((DATEDIFF("2018-12-31", C.entryDate)/3),0),
+			IF((FORMAT((DATEDIFF("2018-12-31", C.entryDate)/3),0)>116),100,(FORMAT((DATEDIFF("2018-12-31", C.entryDate)/3),0))),
+			DATE_FORMAT("[[VERYHARD Xdod]]", '%Y') - DATE_FORMAT(C.dob, '%Y') - (DATE_FORMAT("[[VERYHARD Xdod]]", '00-%m-%d') < DATE_FORMAT(C.dob, '00-%m-%d')),
+			(LEAST(100,FORMAT((DATEDIFF("2018-12-31", C.entryDate)/3),0))*0.01)*(100 -(DATE_FORMAT(NOW(), '%Y') - DATE_FORMAT(C.dob, '%Y') - (DATE_FORMAT(NOW(), '00-%m-%d') < DATE_FORMAT(C.dob, '00-%m-%d'))))
+		FROM celebs AS C
+		WHERE C.id='[[VERYHARD Xcid]]'
+		~cname,cAge,cEnt,cPre,cPct,cAoD,cPts~]]
+	[[/SQL]]
+	
+Posting data ...
+	<META HTTP-EQUIV="refresh" CONTENT="1; URL=http://celeb.micketts.co.uk/main?action=repost~status=[[VERYHARD Xstatus]]~wikipedia=[[VERYHARD Xwww]]~points=[[cPts]]~dod=[[VERYHARD Xdod]]~cid=[[VERYHARD Xcid]]">
+<!--/DEAD-->
+
+<!--REPOST-->
+	[[SQL ~
+		UPDATE celebs
+			SET
+				status='[[VERYHARD Xstatus]]',
+                wikipedia='[[VERYHARD Xwikipedia]]',
+				dod='[[VERYHARD Xdod]]',
+				points='[[VERYHARD Xpoints]]'
+                WHERE id='[[VERYHARD Xcid]]'
+                ~~]]
+        [[/SQL]]
+		Updating ...
+		<META HTTP-EQUIV="refresh" CONTENT="3; URL=http://celeb.micketts.co.uk/main">
+<!--/REPOST-->
+
+<!--NOTDEAD-->
+	[[SQL ~
+		UPDATE celebs
+		SET
+			dob='[[VERYHARD Xdob]]',
+			dod='0000-00-00',
+			status='[[VERYHARD Xstatus]]',
+			wikipedia='[[VERYHARD Xwww]]',
+			points=0
+		WHERE id=[[VERYHARD Xcid]]
+        ~~]]
+	[[/SQL]]	
+	
+<!--/NOTDEAD-->
+
+<!--WIKISEARCH-->
+	<form name="searchform" action="http://en.wikipedia.org/wiki/w/index.php" method="get">
+	
+	<input type="search" name="search" placeholder="Search Wikipedia" title="Search Wikipedia [f]" accesskey="f" id="searchInput"/>
+	<input type="hidden" value="Special:Search" name="title"/>
+	<input type="submit" name="fulltext" value="Search" title="Search Wikipedia for this text" id="mw-searchButton" class="searchButton mw-fallbackSearchButton"/>
+	<input type="submit" name="go" value="Go" title="Go to a page with this exact name if it exists" id="searchButton" class="searchButton"/>
+
+	</form>
+<!--/WIKISEARCH-->
+
+<!--VIEWALLLISTS-->
+	[[SQL ~
+		SELECT id,`short`
+		FROM users
+		~uid,sn~]]
+		[<a href="http://celeb.micketts.co.uk?action=list~id=[[uid]]">[[sn]]</a>]
+	[[/SQL]][<a href="http://celeb.micketts.co.uk?action=list~id=0">All</a>]
+	<br /><br />
+<!--/VIEWALLLISTS-->
+
+<!--RETURNLISTSELECTOR-->
+	[[RETURNTOMENU]]
+	[[IF ($Xid eq 0)]]       [[RETURNLISTALL]]				[[/IF]]
+	[[IF ($Xid > 0)]]        [[RETURNLISTFORUSER]]			[[/IF]]
+	[[RETURNTOMENU]]
+<!--/RETURNLISTSELECTOR-->
+	
+
+<!--RETURNLISTFORUSER-->
+		
+	<table cellpadding="4">
+		<tr>
+
+		</tr>
+		<tr>
+			<td class="listheading">Name</td>
+			<td class="listheading">Date of Birth</td>
+			<td class="listheading">Age</td>
+			<td class="listheading">Score</td>
+			<td class="listheading">Status</td>
+			<td class="listheading">Points</td>
+			<td class="listheading">Manage</td>
+		</tr>
+		[[SQL ~
+			SELECT 
+				C.id,
+				C.`name`,
+				C.wikipedia,
+				S.category,
+				S.hex,
+				DATE_FORMAT(C.dob, '%D %M %Y'),
+				FORMAT((DATEDIFF("2018-12-31", C.entryDate)/3),0),
+				DATE_FORMAT(C.entryDate, '%D %M %Y'),
+				DATE_FORMAT(NOW(), '%Y') - DATE_FORMAT(C.dob, '%Y') - (DATE_FORMAT(NOW(), '00-%m-%d') < DATE_FORMAT(C.dob, '00-%m-%d')),
+				C.points
+			FROM celebs AS C
+			LEFT JOIN noteType AS S
+			ON C.status=S.id
+			WHERE C.owner=[[VERYHARD Xid]];
+			~cid,cname,wname,cCat,cHex,cDoB,pct,cEnt,cAge,pts~]]
+		<tr>
+			<td class="listitem"><a href="https://en.wikipedia.org/wiki/[[wname]]" target="_blank">[[cname]]</a></td>
+			<td class="listitem">[[cDoB]]</td>
+			<td class="listitem">[[cAge]]</td>
+			<td class="listitem">[[IF ($pct > 100)]]100[[/IF]][[IF ($pct < 101)]][[pct]][[/IF]]%</td>
+			<td class="listitem"><font color=[[cHex]]>[[cCat]]</font></td>
+			<td class="listitem">[[IF ($pts > 0)]][[pts]][[/IF]]</td>
+			[[IF ($cCat ne 'DECEASED')]]<td class="listitem">[<a href="/main?action=delete~user=[[VERYHARD Xid]]~cid=[[cid]]">DELETE</a>][<a href="/main?action=update~user=[[VERYHARD Xid]]~cid=[[cid]]">UPDATE</a>]</td>[[/IF]]
+			[[IF ($cCat eq 'DECEASED')]]<td class="listitem">[<font color="#998c89">DELETE</font>][<a href="/main?action=update~user=[[VERYHARD Xid]]~cid=[[cid]]">UPDATE</a>]</td>[[/IF]]
+		<tr>
+		[[/SQL]]
+	</table>	
+	[[SQL ~
+		SELECT sum(points)
+		FROM celebs
+		WHERE owner=[[VERYHARD Xid]]
+		~sum~]]
+		You have currently scored [[sum]] points
+	[[/SQL]]
+	
+<!--/RETURNLISTFORUSER-->
+
+<!--RETURNLISTALL-->
+		<table cellpadding="4">
+		<tr>
+
+		</tr>
+		<tr>
+			<td class="listheading">Name</td>
+			<td class="listheading">Date of Birth</td>
+			<td class="listheading">Age</td>
+			<td class="listheading">Score</td>
+			<td class="listheading">Status</td>
+			<td class="listheading">Owner</td>
+			<td class="listheading">Points</td>
+		</tr>
+		[[SQL ~
+			SELECT 
+				C.`name`,
+				C.wikipedia,
+				S.category,
+				S.hex,
+				DATE_FORMAT(C.dob, '%D %M %Y'),
+				FORMAT((DATEDIFF("2018-12-31", C.entryDate)/3),0),
+				DATE_FORMAT(C.entryDate, '%D %M %Y'),
+				DATE_FORMAT(NOW(), '%Y') - DATE_FORMAT(C.dob, '%Y') - (DATE_FORMAT(NOW(), '00-%m-%d') < DATE_FORMAT(C.dob, '00-%m-%d')),
+				U.short,
+				C.points
+			FROM celebs AS C
+			LEFT JOIN noteType AS S
+			ON C.status=S.id
+			LEFT JOIN users AS U
+			ON C.owner=U.id
+			ORDER BY C.dob DESC;
+			~cname,wname,cCat,cHex,cDoB,pct,cEnt,cAge,cOwn,cPts~]]
+		<tr>
+			<td class="listitem"><a href="https://en.wikipedia.org/wiki/[[wname]]" target="_blank">[[cname]]</a></td>
+			<td class="listitem">[[cDoB]]</td>
+			<td class="listitem">[[cAge]]</td>
+			<td class="listitem">[[IF ($pct > 100)]]100[[/IF]][[IF ($pct < 101)]][[pct]][[/IF]]%</td>
+			<td class="listitem"><font color=[[cHex]]>[[cCat]]</font></td>
+			<td class="listitem">[[cOwn]]</td>
+			<td class="listitem">[[IF ($cPts > 0)]]<font color="red"><b>&nbsp;&nbsp;[[cPts]]</b></font>[[/IF]]</td>
+		</tr>
+		[[/SQL]]	
+	</table>
+<!--/RETURNLISTALL-->
+
+<!--RETURNTOMENU-->
+	<p>
+	<hr>
+	&lt;&lt;&lt;[<a href="/main">HOME</a>]
+	</p>
+<!--/RETURNTOMENU-->
+
+<!--RESETDB-->
+
+	Database reset
+	<a href="/main">RETURN TO MAIN MENU</a>
+<!--/RESETDB-->
+
+<!--HOLDING-->
+Calculate age:
+	SELECT `name`,DATE_FORMAT(NOW(), '%Y') - DATE_FORMAT(dob, '%Y') - (DATE_FORMAT(NOW(), '00-%m-%d') < DATE_FORMAT(dob, '00-%m-%d'))
+	FROM celebs;
+	
+Construct data table
+SELECT C.`name`,C.wikipedia,S.category,S.hex,DATE_FORMAT(C.dob, '%D %M %Y'),FORMAT((DATEDIFF("2018-12-31", C.entryDate)/3),0),DATE_FORMAT(C.entryDate, '%D %M %Y'),DATE_FORMAT(NOW(), '%Y') - DATE_FORMAT(C.dob, '%Y') - (DATE_FORMAT(NOW(), '00-%m-%d') < DATE_FORMAT(C.dob, '00-%m-%d'))
+FROM celebs AS C
+LEFT JOIN noteType AS S
+ON C.status=S.id;
+
+Round down to integer
+SELECT FORMAT((DATEDIFF("2018-12-31", "2018-04-01")/3),0);
+
+# Age x entrydate score cale
+(LEAST(100,FORMAT((DATEDIFF("2018-12-31", "2018-02-17")/3),0))*0.01)*(100 -(DATE_FORMAT(NOW(), '%Y') - DATE_FORMAT(C.dob, '%Y') - (DATE_FORMAT(NOW(), '00-%m-%d') < DATE_FORMAT(C.dob, '00-%m-%d')))) AS calc
+
+
+
+
+<!--/HOLDING-->
+
