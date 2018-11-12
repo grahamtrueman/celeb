@@ -7,8 +7,8 @@ require("/RSCentral/Pearl-Web/library.pl") ;
 $HTMLdir        = '/export/celeb/HTML/'     ;
 
 $DB             = 'DBI:mysql:celeb'                ;
-$DBusername     = 'root'                          ;
-$DBpassword     = 'RomantiC'                      ;
+$DBusername     = 'jboss'                          ;
+$DBpassword     = 'mrsjboss'                       ;
 
 $DEBUGlevel     = 7                               ;
 
