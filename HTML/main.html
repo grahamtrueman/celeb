@@ -29,7 +29,7 @@
                         <td class="tophead" width=20>&nbsp;</td>
                         <td class="tophead" width=240></td>
                         <td width=20 class="title">&nbsp;</td>
-                        <td width=240 class="title">CELEB LIST 2018</td>
+                        <td width=240 class="title">CELEB LIST 2019</td>
                         <td width=20 class="title">&nbsp;</td>
                         <td width=240 class="tophead" valign="bottom" align="right"><span class="listitem"><strong>[[TIMESTAMP]]</strong></span></td>
                         <td class="tophead" width=20>&nbsp;</td>
@@ -56,8 +56,8 @@
                         <td class="backpanel" colspan="7">&nbsp;</td>
                 </tr>
         </table>
-		
-		
+
+
 
 <!--/SETMAINTABLE-->
 
@@ -116,7 +116,7 @@
 				<input type="hidden" name="action" value="edit">
         </form>
 <!--/USERSELECT-->
-	
+
 <!--CHANGER-->
 
 	[[SQL ~
@@ -150,10 +150,10 @@
 			ON C.owner=U.id
 			WHERE C.entryDate=(SELECT MAX(entryDate) FROM celebs)
 			~fn,wp,own,dte,sn~]]
-			
-		[[/SQL]]	
+
+		[[/SQL]]
 		<p>
-			
+
 			<strong><a href="https://en.wikipedia.org/wiki/[[wp]]" target="_blank">[[fn]]</a></strong><br />
 			<i>Added by [[sn]] <br />&nbsp;&nbsp;&nbsp;on: [[dte]]</i>
 		</p>
@@ -164,13 +164,13 @@
 [[RETURNTOMENU]]
 
 	[[SQL ~
-		SELECT short 
+		SELECT short
 		FROM users
 		WHERE id=[[VERYHARD Xid]]
 		~uname~]]
 	<h2>This is the editor section for [[uname]]</h2>
 	[[/SQL]]
-	
+
 	<table align="centre">
 		<tr>
 			<td class="listheading">Name</td>
@@ -208,12 +208,12 @@
 			ON C.owner=U.id
 			WHERE U.id='[[VERYHARD Xid]]';
 			~tot,rem~]]
-			
+
 			[[IF ($tot eq 10)]]<font color="#000c51">You have used all 10 of your available selections</font>[[/IF]]
 			[[IF ($tot < 10)]]<font color="#000c51">You used [[tot]] of your available selections, and have <font color="#a72020">[[rem]]</font> remaining</font><br />[[ADDENTRY]][[/IF]]
-		[[/SQL]]	
+		[[/SQL]]
 
-		
+
 <!--/EDITOR-->
 
 <!--ADDENTRY-->
@@ -223,11 +223,11 @@
 		</tr>
 		<tr>
 			<td class="displaybox" colspan=5>Add a new celebrity to your list</td>
-		</tr>	
+		</tr>
 		<tr>
 			<td colspan="5"></td>
 		</tr>
-			
+
 			<form name="addceleb" action="/main" method="post">
 			<input type="hidden" name="action" value="addceleb">
 			<input type="hidden" name="id" value="[[VERYHARD Xid]]">
@@ -262,7 +262,7 @@
 					[[/SQL]]
 				</select>
 			</td>
-		<tr>	
+		<tr>
 			<td colspan="2"></td>
 			<td class="standardtext"><input type="submit" value="add"><input type="reset" value="reset"></td>
 			<td></td>
@@ -271,16 +271,16 @@
 		</tr>
 	</table>
 <!--/ADDENTRY-->
-	
+
 <!--ADDDATA-->
-	
+
 	[[SQL ~
 		INSERT INTO celebs (name, wikipedia, dob, `status`, entryDate, owner)
 		value ('[[VERYHARD Xcname]]','[[VERYHARD Xwname]]','[[VERYHARD Xdob]]','[[VERYHARD Xhealth]]',CURDATE(),[[VERYHARD Xid]]);
 		~~]]
 	[[/SQL]]
-	
-	
+
+
 	<META HTTP-EQUIV="refresh" CONTENT="1; URL=http://celeb.micketts.co.uk/main">
 <!--/ADDDATA-->
 
@@ -292,17 +292,17 @@
 		ON C.status=N.id
 		WHERE C.id=[[VERYHARD Xcid]]
 		~cName,cCat~]]
-	[[/SQL]]	
+	[[/SQL]]
 	Celeb: [[cName]]
 	Status: [[cCat]]
 	[[IF ($cCat eq 'DECEASED')]] Your celeb is dead, you cannot delete[[/IF]]
 	[[IF ($cCat ne 'DECEASED')]][[DELETEPERM]][[/IF]]
-	
+
 <!--/DELETE-->
 
 <!--DELETEPERM-->
 	    [[SQLMOD ~
-			DELETE from celebs	
+			DELETE from celebs
             WHERE id=[[VERYHARD Xcid]]
             ~~]]
             <font color="Green">Record deleted</font>
@@ -324,12 +324,12 @@
 		<input type="hidden" name="user" value="[[VERYHARD Xuser]]">
 		[[SQL ~
 			SELECT C.name,C.wikipedia,C.dob,C.status,S.category,S.hex,C.owner,U.`short`,
-				DATE_FORMAT(NOW(), '%Y') - DATE_FORMAT(C.dob, '%Y') - (DATE_FORMAT(NOW(), '00-%m-%d') < DATE_FORMAT(C.dob, '00-%m-%d')), 
+				DATE_FORMAT(NOW(), '%Y') - DATE_FORMAT(C.dob, '%Y') - (DATE_FORMAT(NOW(), '00-%m-%d') < DATE_FORMAT(C.dob, '00-%m-%d')),
 				C.entryDate,
-				FORMAT((DATEDIFF("2018-12-31", C.entryDate)/3),0),
-				IF((FORMAT((DATEDIFF("2018-12-31", C.entryDate)/3),0)>116),100,(FORMAT((DATEDIFF("2018-12-31", C.entryDate)/3),0))),
+				FORMAT((DATEDIFF("2019-12-31", C.entryDate)/3),0),
+				IF((FORMAT((DATEDIFF("2019-12-31", C.entryDate)/3),0)>116),100,(FORMAT((DATEDIFF("2019-12-31", C.entryDate)/3),0))),
 				DATE_FORMAT("[[VERYHARD Xdod]]", '%Y') - DATE_FORMAT(C.dob, '%Y') - (DATE_FORMAT("[[VERYHARD Xdod]]", '00-%m-%d') < DATE_FORMAT(C.dob, '00-%m-%d')),
-				(LEAST(100,FORMAT((DATEDIFF("2018-12-31", "2018-09-17")/3),0))*0.01)*(100 -(DATE_FORMAT(NOW(), '%Y') - DATE_FORMAT(C.dob, '%Y') - (DATE_FORMAT(NOW(), '00-%m-%d') < DATE_FORMAT(C.dob, '00-%m-%d'))))
+				(LEAST(100,FORMAT((DATEDIFF("2019-12-31", "2019-09-17")/3),0))*0.01)*(100 -(DATE_FORMAT(NOW(), '%Y') - DATE_FORMAT(C.dob, '%Y') - (DATE_FORMAT(NOW(), '00-%m-%d') < DATE_FORMAT(C.dob, '00-%m-%d'))))
 			FROM celebs AS C
 			LEFT JOIN noteType AS S
 			ON C.status=S.id
@@ -341,15 +341,15 @@
 			<td class="standardtext">Name: </td>
 			<td class="standardtext"><a href="http://en.wikipedia.org/wiki/[[www]]" target="_blank">[[cname]]</a></td>
 		</tr>
-		<tr>	
+		<tr>
 			<td class="standardtext">Wikipedia URL:</td>
 			<td class="standardtext"><input name=www type="text" value='[[www]]'></td>
 		</tr>
-		<tr>	
+		<tr>
 			<td class="standardtext">Date of Birth:</td>
 			<td class="standardtext"><input name=dob type="text" value='[[cDoB]]'></td>
 		</tr>
-		<tr>	
+		<tr>
 			<td class="standardtext">Date of Death:</td>
 			<td class="standardtext"><input name=dod type="text" value=''></td>
 		</tr>
@@ -375,14 +375,14 @@
 			<input type="hidden" name="user" value="[[VERYHARD Xuser]]">
 			<td></td>
 			<td class="standardtext"><input type="submit" value="delete"></td>
-		</form>	
+		</form>
 		</tr>
 	</table>
 	<p>If adding a Date of Death you must set the status of your celebrity to <font color="#a72020">DECEASED</font></p>
 	[[RETURNTOMENU]]
 <!--/UPDATE-->
 <!--STATUSSELECT-->
-				[[SQL ~	
+				[[SQL ~
 					SELECT id,category
 					FROM noteType
 					~nid,ncat~]]
@@ -398,32 +398,32 @@
 		WHERE id=[[VERYHARD Xstatus]]
 		~Cat~]]
 	[[/SQL]]
-	
+
 	Category value: [[Cat]]
 	[[IF ($Cat eq 'DECEASED')]]	[[DEAD]]	[[/IF]]
-	[[IF ($Cat ne 'DECEASED')]]	[[NOTDEAD]]	[[/IF]]	
+	[[IF ($Cat ne 'DECEASED')]]	[[NOTDEAD]]	[[/IF]]
 	Record set updated
 	[[RETURNTOMENU]]
 	<META HTTP-EQUIV="refresh" CONTENT="2; URL=http://celeb.micketts.co.uk/main">
-		
+
 <!--/DATAEDIT-->
 
 <!--DEAD-->
 	Your celeb is dead ... calculating points .... <br />
 	[[SQL ~
-		SELECT 
+		SELECT
 			`name`,
 			DATE_FORMAT(NOW(), '%Y') - DATE_FORMAT(C.dob, '%Y') - (DATE_FORMAT(NOW(), '00-%m-%d') < DATE_FORMAT(C.dob, '00-%m-%d')),
 			C.entryDate,
-			FORMAT((DATEDIFF("2018-12-31", C.entryDate)/3),0),
-			IF((FORMAT((DATEDIFF("2018-12-31", C.entryDate)/3),0)>116),100,(FORMAT((DATEDIFF("2018-12-31", C.entryDate)/3),0))),
+			FORMAT((DATEDIFF("2019-12-31", C.entryDate)/3),0),
+			IF((FORMAT((DATEDIFF("2019-12-31", C.entryDate)/3),0)>116),100,(FORMAT((DATEDIFF("2019-12-31", C.entryDate)/3),0))),
 			DATE_FORMAT("[[VERYHARD Xdod]]", '%Y') - DATE_FORMAT(C.dob, '%Y') - (DATE_FORMAT("[[VERYHARD Xdod]]", '00-%m-%d') < DATE_FORMAT(C.dob, '00-%m-%d')),
-			(LEAST(100,FORMAT((DATEDIFF("2018-12-31", C.entryDate)/3),0))*0.01)*(100 -(DATE_FORMAT(NOW(), '%Y') - DATE_FORMAT(C.dob, '%Y') - (DATE_FORMAT(NOW(), '00-%m-%d') < DATE_FORMAT(C.dob, '00-%m-%d'))))
+			(LEAST(100,FORMAT((DATEDIFF("2019-12-31", C.entryDate)/3),0))*0.01)*(100 -(DATE_FORMAT(NOW(), '%Y') - DATE_FORMAT(C.dob, '%Y') - (DATE_FORMAT(NOW(), '00-%m-%d') < DATE_FORMAT(C.dob, '00-%m-%d'))))
 		FROM celebs AS C
 		WHERE C.id='[[VERYHARD Xcid]]'
 		~cname,cAge,cEnt,cPre,cPct,cAoD,cPts~]]
 	[[/SQL]]
-	
+
 Posting data ...
 	<META HTTP-EQUIV="refresh" CONTENT="1; URL=http://celeb.micketts.co.uk/main?action=repost~status=[[VERYHARD Xstatus]]~wikipedia=[[VERYHARD Xwww]]~points=[[cPts]]~dod=[[VERYHARD Xdod]]~cid=[[VERYHARD Xcid]]">
 <!--/DEAD-->
@@ -454,13 +454,13 @@ Posting data ...
 			points=0
 		WHERE id=[[VERYHARD Xcid]]
         ~~]]
-	[[/SQL]]	
-	
+	[[/SQL]]
+
 <!--/NOTDEAD-->
 
 <!--WIKISEARCH-->
 	<form name="searchform" action="http://en.wikipedia.org/wiki/w/index.php" method="get">
-	
+
 	<input type="search" name="search" placeholder="Search Wikipedia" title="Search Wikipedia [f]" accesskey="f" id="searchInput"/>
 	<input type="hidden" value="Special:Search" name="title"/>
 	<input type="submit" name="fulltext" value="Search" title="Search Wikipedia for this text" id="mw-searchButton" class="searchButton mw-fallbackSearchButton"/>
@@ -485,10 +485,10 @@ Posting data ...
 	[[IF ($Xid > 0)]]        [[RETURNLISTFORUSER]]			[[/IF]]
 	[[RETURNTOMENU]]
 <!--/RETURNLISTSELECTOR-->
-	
+
 
 <!--RETURNLISTFORUSER-->
-		
+
 	<table cellpadding="4">
 		<tr>
 
@@ -503,14 +503,14 @@ Posting data ...
 			<td class="listheading">Manage</td>
 		</tr>
 		[[SQL ~
-			SELECT 
+			SELECT
 				C.id,
 				C.`name`,
 				C.wikipedia,
 				S.category,
 				S.hex,
 				DATE_FORMAT(C.dob, '%D %M %Y'),
-				FORMAT((DATEDIFF("2018-12-31", C.entryDate)/3),0),
+				FORMAT((DATEDIFF("2019-12-31", C.entryDate)/3),0),
 				DATE_FORMAT(C.entryDate, '%D %M %Y'),
 				DATE_FORMAT(NOW(), '%Y') - DATE_FORMAT(C.dob, '%Y') - (DATE_FORMAT(NOW(), '00-%m-%d') < DATE_FORMAT(C.dob, '00-%m-%d')),
 				C.points
@@ -530,7 +530,7 @@ Posting data ...
 			[[IF ($cCat eq 'DECEASED')]]<td class="listitem">[<font color="#998c89">DELETE</font>][<a href="/main?action=update~user=[[VERYHARD Xid]]~cid=[[cid]]">UPDATE</a>]</td>[[/IF]]
 		<tr>
 		[[/SQL]]
-	</table>	
+	</table>
 	[[SQL ~
 		SELECT sum(points)
 		FROM celebs
@@ -538,7 +538,7 @@ Posting data ...
 		~sum~]]
 		You have currently scored [[sum]] points
 	[[/SQL]]
-	
+
 <!--/RETURNLISTFORUSER-->
 
 <!--RETURNLISTALL-->
@@ -556,13 +556,13 @@ Posting data ...
 			<td class="listheading">Points</td>
 		</tr>
 		[[SQL ~
-			SELECT 
+			SELECT
 				C.`name`,
 				C.wikipedia,
 				S.category,
 				S.hex,
 				DATE_FORMAT(C.dob, '%D %M %Y'),
-				FORMAT((DATEDIFF("2018-12-31", C.entryDate)/3),0),
+				FORMAT((DATEDIFF("2019-12-31", C.entryDate)/3),0),
 				DATE_FORMAT(C.entryDate, '%D %M %Y'),
 				DATE_FORMAT(NOW(), '%Y') - DATE_FORMAT(C.dob, '%Y') - (DATE_FORMAT(NOW(), '00-%m-%d') < DATE_FORMAT(C.dob, '00-%m-%d')),
 				U.short,
@@ -583,7 +583,7 @@ Posting data ...
 			<td class="listitem">[[cOwn]]</td>
 			<td class="listitem">[[IF ($cPts > 0)]]<font color="red"><b>&nbsp;&nbsp;[[cPts]]</b></font>[[/IF]]</td>
 		</tr>
-		[[/SQL]]	
+		[[/SQL]]
 	</table>
 <!--/RETURNLISTALL-->
 
@@ -604,21 +604,20 @@ Posting data ...
 Calculate age:
 	SELECT `name`,DATE_FORMAT(NOW(), '%Y') - DATE_FORMAT(dob, '%Y') - (DATE_FORMAT(NOW(), '00-%m-%d') < DATE_FORMAT(dob, '00-%m-%d'))
 	FROM celebs;
-	
+
 Construct data table
-SELECT C.`name`,C.wikipedia,S.category,S.hex,DATE_FORMAT(C.dob, '%D %M %Y'),FORMAT((DATEDIFF("2018-12-31", C.entryDate)/3),0),DATE_FORMAT(C.entryDate, '%D %M %Y'),DATE_FORMAT(NOW(), '%Y') - DATE_FORMAT(C.dob, '%Y') - (DATE_FORMAT(NOW(), '00-%m-%d') < DATE_FORMAT(C.dob, '00-%m-%d'))
+SELECT C.`name`,C.wikipedia,S.category,S.hex,DATE_FORMAT(C.dob, '%D %M %Y'),FORMAT((DATEDIFF("2019-12-31", C.entryDate)/3),0),DATE_FORMAT(C.entryDate, '%D %M %Y'),DATE_FORMAT(NOW(), '%Y') - DATE_FORMAT(C.dob, '%Y') - (DATE_FORMAT(NOW(), '00-%m-%d') < DATE_FORMAT(C.dob, '00-%m-%d'))
 FROM celebs AS C
 LEFT JOIN noteType AS S
 ON C.status=S.id;
 
 Round down to integer
-SELECT FORMAT((DATEDIFF("2018-12-31", "2018-04-01")/3),0);
+SELECT FORMAT((DATEDIFF("2019-12-31", "2019-04-01")/3),0);
 
 # Age x entrydate score cale
-(LEAST(100,FORMAT((DATEDIFF("2018-12-31", "2018-02-17")/3),0))*0.01)*(100 -(DATE_FORMAT(NOW(), '%Y') - DATE_FORMAT(C.dob, '%Y') - (DATE_FORMAT(NOW(), '00-%m-%d') < DATE_FORMAT(C.dob, '00-%m-%d')))) AS calc
+(LEAST(100,FORMAT((DATEDIFF("2019-12-31", "2019-02-17")/3),0))*0.01)*(100 -(DATE_FORMAT(NOW(), '%Y') - DATE_FORMAT(C.dob, '%Y') - (DATE_FORMAT(NOW(), '00-%m-%d') < DATE_FORMAT(C.dob, '00-%m-%d')))) AS calc
 
 
 
 
 <!--/HOLDING-->
-
